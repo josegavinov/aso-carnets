@@ -1,8 +1,9 @@
-# Configuración para que el empaquetador de funciones funcione correctamente
 [functions]
+  # Esta es la nueva línea clave. Le dice al empaquetador que deje
+  # esta librería intacta para que sus componentes nativos funcionen.
+  external_node_modules = ["@libsql/client"]
   node_bundler = "esbuild"
 
-# Plugin para instalar las dependencias de las funciones
-# Esta es la parte que soluciona el error.
+# Este plugin sigue siendo necesario para instalar las dependencias
 [[plugins]]
   package = "@netlify/plugin-functions-install-core"
