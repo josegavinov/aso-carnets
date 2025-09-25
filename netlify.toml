@@ -1,0 +1,4 @@
+[functions]
+  # Esta configuración asegura que Netlify encuentre e instale
+  # las dependencias de tus funciones correctamente.
+  node_bundler = "esbuild"
