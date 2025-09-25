@@ -1,0 +1,9 @@
+# Archivos de secretos locales
+.env
+
+# Dependencias de Node.js (se instalan, no se suben)
+node_modules/
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db

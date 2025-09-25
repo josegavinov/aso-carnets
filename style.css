@@ -1,0 +1,133 @@
+/* --- Estilos Generales --- */
+body {
+    background-color: #FFFFFF;
+    font-family: 'Roboto', sans-serif; /* Usamos la fuente de Google */
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.carnet-container {
+    max-width: 800px;
+    width: 100%;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05); /* Sombra sutil para el contenedor */
+    padding: 20px;
+}
+
+/* --- Encabezado --- */
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.logo-abg {
+    width: 150px; /* Ajusta el tamaño si es necesario */
+}
+
+.instagram-handle {
+    font-weight: 700;
+    color: #333;
+}
+
+/* --- Contenido Principal --- */
+.main-content {
+    text-align: center;
+}
+
+.titulo-carnet {
+    background-color: #A0D8F0; /* Color azul claro del diseño */
+    color: #000000; /* Color azul oscuro para el texto */
+    font-weight: 700;
+    padding: 10px 20px;
+    border-radius: 20px; /* Bordes redondeados */
+    display: inline-block; /* Para que el fondo solo ocupe el espacio del texto */
+    margin-bottom: 25px;
+}
+
+.logo-dream-team {
+    max-width: 350px; /* Ajusta el tamaño si es necesario */
+    width: 80%;
+    margin-bottom: 0px;
+}
+
+.info-jugador {
+    color: #333;
+    line-height: 1.8;
+    font-size: 1.1em;
+    margin-bottom: 40px;
+}
+
+.info-jugador p {
+    margin: 5px 0;
+}
+
+/* --- Sección Cédula --- */
+.cedula-seccion {
+    background-color: #A0D8F0; /* Mismo azul claro */
+    border-radius: 15px;
+    padding: 20px;
+}
+
+.titulo-cedula {
+    text-align: center;
+    color: #000000;
+    margin-top: 0;
+}
+
+.imagenes-cedula {
+    display: flex;
+    justify-content: center;
+    gap: 15px; /* Espacio entre las imágenes */
+    flex-wrap: wrap; /* Para que se adapten en pantallas pequeñas */
+}
+
+.imagenes-cedula img {
+    max-width: 100%;
+    width: 350px; /* Ancho máximo para cada imagen */
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* --- Diseño Adaptable (Responsive) --- */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
+    .logo-dream-team {
+        width: 100%; /* Ocupa más ancho en móvil */
+    }
+
+    .info-jugador {
+        font-size: 1em;
+    }
+    
+    .imagenes-cedula {
+        flex-direction: column; /* Imágenes una debajo de la otra */
+        align-items: center;
+    }
+
+    .imagenes-cedula img {
+        width: 100%; /* Ocupan todo el ancho disponible */
+    }
+}
+.header-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+.abg-title-centered {
+    text-align: center;
+    font-weight: 700;
+    margin-top: 8px;
+    margin-bottom: 28px;
+    color: #000000;
+    font-size: 1.1em;
+}
