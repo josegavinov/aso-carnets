@@ -1,4 +1,8 @@
+# Configuración para que el empaquetador de funciones funcione correctamente
 [functions]
-  # Esta configuración asegura que Netlify encuentre e instale
-  # las dependencias de tus funciones correctamente.
   node_bundler = "esbuild"
+
+# Plugin para instalar las dependencias de las funciones
+# Esta es la parte que soluciona el error.
+[[plugins]]
+  package = "@netlify/plugin-functions-install-core"
