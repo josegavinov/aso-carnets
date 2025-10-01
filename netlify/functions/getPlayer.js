@@ -1,57 +1,55 @@
-// Archivo: netlify/functions/getPlayer.js (Versión para Turso)
-// Propósito: Conectarse de forma segura a Turso para buscar UN solo jugador por su ID.
+// Archivo: netlify/functions/getPlayer.js (Versión final y funcional)
 
-import { createClient } from "@libsql/client";
-
-// Lee las credenciales seguras desde las variables de entorno configuradas en Netlify
-const TURSO_DATABASE_URL = process.env.TURSO_DATABASE_URL;
-const TURSO_AUTH_TOKEN = process.env.TURSO_AUTH_TOKEN;
-
-// Crea el cliente de Turso que usaremos para hacer las consultas
-const client = createClient({
-  url: TURSO_DATABASE_URL,
-  authToken: TURSO_AUTH_TOKEN,
-});
-
-// Esta es la función principal que Netlify ejecutará
 exports.handler = async function (event, context) {
-  // 1. Obtenemos el ID del jugador que nos manda el script del navegador
-  const jugadorId = event.queryStringParameters.id;
+    // Volvemos a usar las variables de entorno, es más seguro y profesional.
+    const dbUrl = process.env.TURSO_DATABASE_URL;
+    const authToken = process.env.TURSO_AUTH_TOKEN;
+    const playerId = event.queryStringParameters.id;
 
-  if (!jugadorId) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: "ID de jugador no especificado" }),
-    };
-  }
-
-  try {
-    // 2. Ejecutamos una consulta SQL para buscar al jugador por su ID
-    const rs = await client.execute({
-      sql: "SELECT * FROM jugadores WHERE id = ?",
-      args: [jugadorId],
-    });
-
-    // Si la consulta no devuelve ninguna fila, el jugador no fue encontrado
-    if (rs.rows.length === 0) {
-      return {
-        statusCode: 404,
-        body: JSON.stringify({ error: "Jugador no encontrado" }),
-      };
+    if (!playerId) {
+        return { statusCode: 400, body: JSON.stringify({ error: "ID de jugador no especificado" }) };
     }
 
-    // 3. Devolvemos la primera (y única) fila encontrada al navegador
-    return {
-      statusCode: 200,
-      body: JSON.stringify(rs.rows[0]),
-    };
+    try {
+        const response = await fetch(dbUrl, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                statements: [{ q: "SELECT * FROM jugadores WHERE id = ?", params: [playerId] }]
+            }),
+        });
 
-  } catch (error) {
-    // Si algo sale mal, devolvemos un error genérico
-    console.error("Error en la función serverless:", error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "No se pudo obtener la información del jugador" }),
-    };
-  }
+        const data = await response.json();
+
+        if (data.error) { throw new Error(data.error.message); }
+
+        // ----- LA CORRECCIÓN CLAVE ESTÁ AQUÍ -----
+        // Leemos la respuesta como una lista y accedemos al primer elemento.
+        const result = data[0].results;
+
+        if (result.rows.length === 0) {
+            return {
+                statusCode: 404,
+                body: JSON.stringify({ error: `No se encontró ningún jugador con el ID ${playerId}` }),
+            };
+        }
+
+        // Reconstruimos el objeto del jugador combinando columnas y valores
+        const columns = result.columns;
+        const values = result.rows[0];
+        const formattedPlayer = {};
+        for (let i = 0; i < columns.length; i++) {
+            formattedPlayer[columns[i]] = values[i];
+        }
+        // ------------------------------------------
+
+        return {
+            statusCode: 200,
+            body: JSON.stringify(formattedPlayer),
+        };
+
+    } catch (error) {
+        console.error("Error en getPlayer:", error);
+        return { statusCode: 500, body: JSON.stringify({ error: "No se pudo obtener la información del jugador." }) };
+    }
 };
