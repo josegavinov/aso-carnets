@@ -1,5 +1,4 @@
-// Archivo: netlify/functions/get-roster.js (Versión final y funcional)
-
+// Archivo: netlify/functions/get-roster.js (Versión con todos los datos)
 exports.handler = async function (event, context) {
     const dbUrl = process.env.TURSO_DATABASE_URL;
     const authToken = process.env.TURSO_AUTH_TOKEN;
@@ -7,7 +6,7 @@ exports.handler = async function (event, context) {
     const equipo = event.queryStringParameters.equipo;
 
     if (!torneo || !equipo) {
-        return { statusCode: 400, body: JSON.stringify({ error: "Faltan parámetros de torneo o equipo" }) };
+        return { statusCode: 400, body: JSON.stringify({ error: "Faltan parámetros" }) };
     }
 
     try {
@@ -16,11 +15,12 @@ exports.handler = async function (event, context) {
             headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 statements: [{
-                    q: `SELECT j.nombre, j.fechaNacimiento, j.camiseta 
+                    // Seleccionamos todos los campos que necesitamos
+                    q: `SELECT j.id, j.nombre, j.fechaNacimiento, j.fechaExpiracion, j.posicion, j.fotoJugadorURL, j.fotoFrontalURL, j.fotoTraseraURL 
                         FROM jugadores j
                         INNER JOIN inscripciones i ON j.id = i.jugador_id
                         WHERE i.torneo_nombre = ? AND i.equipo_nombre = ?
-                        ORDER BY j.camiseta`,
+                        ORDER BY j.nombre`,
                     params: [torneo, equipo],
                 }]
             }),
@@ -30,9 +30,7 @@ exports.handler = async function (event, context) {
 
         if (data.error) { throw new Error(data.error.message); }
 
-        // ----- LA MISMA CORRECCIÓN APLICADA AQUÍ -----
         const result = data[0].results;
-        
         const columns = result.columns;
         const rows = result.rows.map(rowValues => {
             const playerObject = {};
@@ -41,15 +39,13 @@ exports.handler = async function (event, context) {
             }
             return playerObject;
         });
-        // ------------------------------------------
 
         return {
             statusCode: 200,
             body: JSON.stringify(rows),
         };
-
     } catch (error) {
         console.error("Error en get-roster:", error);
-        return { statusCode: 500, body: JSON.stringify({ error: "No se pudo obtener la lista del equipo." }) };
+        return { statusCode: 500, body: JSON.stringify({ error: "No se pudo obtener la lista" }) };
     }
 };

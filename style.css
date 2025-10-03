@@ -131,3 +131,103 @@ body {
     color: #000000;
     font-size: 1.1em;
 }
+/* --- Nuevos Estilos para Roster Interactivo --- */
+
+/* Barra de búsqueda */
+.search-bar-container {
+    position: relative;
+    margin-bottom: 24px;
+}
+.search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+}
+#search-input {
+    width: 100%;
+    padding: 12px 12px 12px 40px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+#search-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
+}
+
+/* Tabla interactiva */
+.roster-tabla-interactiva .col-jugador {
+    width: 50%;
+}
+.roster-tabla-interactiva tr.player-row {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+.roster-tabla-interactiva tr.player-row:hover {
+    background-color: #f9fafb;
+}
+
+.player-info-cell {
+    display: flex;
+    align-items: center;
+}
+.player-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%; /* Imágenes circulares */
+    object-fit: cover;
+    margin-right: 12px;
+}
+.player-name {
+    font-weight: 700;
+}
+.player-dob {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+/* Fila desplegable (acordeón) */
+.details-row {
+    display: none; /* Oculta por defecto */
+}
+.details-cell {
+    padding: 20px !important;
+    background-color: #f9fafb;
+}
+.cedula-container-rost {
+    text-align: center;
+}
+.cedula-container-rost h3 {
+    font-size: 16px;
+    color: #374151;
+    margin-bottom: 16px;
+}
+.cedula-images-rost {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+}
+.cedula-images-rost img {
+    max-width: 45%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.expand-icon {
+    text-align: right;
+}
+.expand-icon .fa-chevron-down {
+    transition: transform 0.3s ease;
+}
+.details-row.visible .expand-icon .fa-chevron-down {
+    transform: rotate(180deg);
+}
+.no-results-message {
+    text-align: center;
+    padding: 20px;
+    color: #6b7280;
+}

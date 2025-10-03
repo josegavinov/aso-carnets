@@ -4,21 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Roster de Equipo</title>
-    <link rel="stylesheet" href="style.css"> </head>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
 <body>
-    <div class="carnet-container">
-        <h1 id="nombre-equipo">Cargando equipo...</h1>
-        <table id="roster-tabla">
+    <div class="content-container">
+        <h1 id="nombre-equipo">Cargando Roster...</h1>
+        
+        <div class="search-bar-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="search-input" placeholder="Buscar jugador por nombre...">
+        </div>
+
+        <table class="roster-tabla-interactiva">
             <thead>
                 <tr>
-                    <th>Camiseta</th>
-                    <th>Nombre</th>
-                    <th>Edad</th>
-                </tr>
+                    <th class="col-jugador">Jugador</th>
+                    <th>Posición</th>
+                    <th>Vencimiento</th>
+                    <th></th> </tr>
             </thead>
-            <tbody>
+            <tbody id="roster-body">
                 </tbody>
         </table>
+        <p id="no-results" class="no-results-message" style="display: none;">No se encontraron jugadores con ese nombre.</p>
     </div>
     <script src="roster.js"></script>
 </body>

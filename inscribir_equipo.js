@@ -1,22 +1,28 @@
-// Archivo: agregar_jugador.js (Versión con link directo al carnet)
+// Archivo: inscribir_equipo.js (Versión con manejo de errores corregido)
 require('dotenv').config();
 const readlineSync = require('readline-sync');
 
 const dbUrl = process.env.TURSO_DATABASE_URL;
 const authToken = process.env.TURSO_AUTH_TOKEN;
 
-async function agregarJugador() {
-    console.log("--- ⚽ Nuevo Jugador (Pasaporte Anual) ---");
-    const nombre = readlineSync.question('Nombre completo: ');
-    const cedula = readlineSync.question('Cédula: ');
-    const fechaNacimiento = readlineSync.question('Fecha de Nacimiento (YYYY-MM-DD): ');
-    const camiseta = readlineSync.question('Número de camiseta: ');
-    const equipo = readlineSync.question('Equipo principal/actual: ');
-    const logoEquipoURL = readlineSync.question('URL del logo del equipo: ');
-    const fotoFrontalURL = readlineSync.question('URL de la foto frontal: ');
-    const fotoTraseraURL = readlineSync.question('URL de la foto trasera: ');
+async function inscribirEquipo() {
+    console.log("--- 📝 Inscribir Equipo a Torneo ---");
+    const torneo = readlineSync.question('Nombre del Torneo: ');
+    const equipo = readlineSync.question('Nombre del Equipo para este torneo: ');
+    const idsInput = readlineSync.question('Ingresa los IDs de los jugadores, separados por comas (ej: 1, 5, 8, 12): ');
     
-    console.log("\nInsertando en la base de datos...");
+    const jugadorIds = idsInput.split(',').map(id => parseInt(id.trim()));
+    if (jugadorIds.some(isNaN)) {
+        console.error("Error: Asegúrate de que todos los IDs sean números.");
+        return;
+    }
+
+    const statements = jugadorIds.map(jugadorId => ({
+        q: 'INSERT INTO inscripciones (torneo_nombre, equipo_nombre, jugador_id) VALUES (?, ?, ?)',
+        params: [torneo, equipo, jugadorId],
+    }));
+
+    console.log(`\nInscribiendo ${jugadorIds.length} jugadores al torneo...`);
 
     try {
         const response = await fetch(dbUrl, {
@@ -25,36 +31,32 @@ async function agregarJugador() {
                 'Authorization': `Bearer ${authToken}`,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                statements: [
-                    {
-                        q: `INSERT INTO jugadores (nombre, cedula, fechaNacimiento, camiseta, equipo, logoEquipoURL, fotoFrontalURL, fotoTraseraURL) 
-                              VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id`,
-                        params: [nombre, cedula, fechaNacimiento, camiseta, equipo, logoEquipoURL, fotoFrontalURL, fotoTraseraURL],
-                    }
-                ],
-            }),
+            body: JSON.stringify({ statements: statements }),
         });
 
         const data = await response.json();
-        
-        if (data.error) { throw new Error(data.error.message); }
-        if (data[0].error) { throw new Error(data[0].error.message); }
 
-        const nuevoId = data[0].results.rows[0][0];
+        // --- CORRECCIÓN EN EL MANEJO DE ERRORES ---
+        // Verificamos si la respuesta es un error directo
+        if (data.error) {
+            throw new Error(data.error); // Usamos 'data.error' directamente
+        }
+        // Verificamos si la respuesta es una lista y el primer elemento es un error
+        // El '?' (optional chaining) evita un error si 'data[0]' no existe.
+        if (data[0]?.error) {
+            throw new Error(data[0].error); // Usamos 'data[0].error' directamente
+        }
+        // --- FIN DE LA CORRECCIÓN ---
 
-        // --- LA MEJORA ESTÁ AQUÍ ---
-        const linkCarnet = `https://aso-carnets.netlify.app/?id=${nuevoId}`;
-
-        console.log("\n✅ ¡Jugador agregado con éxito!");
-        console.log(`🆔 ID Asignado: ${nuevoId}`); // Mantenemos el ID por si lo necesitas para los rosters
-        console.log(`🔗 Link del Carnet Virtual: ${linkCarnet}`); // Añadimos el link directo
-        // --- FIN DE LA MEJORA ---
+        const linkRoster = `https://aso-carnets.netlify.app/roster.html?torneo=${encodeURIComponent(torneo)}&equipo=${encodeURIComponent(equipo)}`;
+        console.log("\n✅ ¡Equipo inscrito con éxito!");
+        console.log(`🔗 Link del Roster Virtual: ${linkRoster}`);
 
     } catch (error) {
-        console.error("\n❌ ERROR: No se pudo agregar al jugador.");
+        console.error("\n❌ ERROR: No se pudo inscribir al equipo.");
+        // Ahora 'error.message' tendrá el texto correcto del error de la base de datos
         console.error("Razón:", error.message);
     }
 }
 
-agregarJugador();
+inscribirEquipo();

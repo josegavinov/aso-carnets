@@ -1,5 +1,3 @@
-// Archivo: script.js (Versión corregida para Turso)
-
 window.onload = async function() {
     const params = new URLSearchParams(window.location.search);
     const jugadorId = params.get('id');
@@ -14,25 +12,39 @@ window.onload = async function() {
         const jugador = await response.json();
 
         if (!response.ok) {
-            // Si la función devuelve un error (ej: 404), usamos el mensaje de error que nos manda
             throw new Error(jugador.error || "Ocurrió un error al buscar el jugador.");
         }
+
+        // --- SECCIÓN DE FECHAS CORREGIDA ---
+        
+        // Formatear Fecha de Nacimiento (Método seguro)
+        // Tomamos "2005-06-04", lo separamos en ["2005", "06", "04"] y lo reordenamos.
+        const [anioNac, mesNac, diaNac] = jugador.fechaNacimiento.split('-');
+        document.getElementById('fecha-jugador').innerText = `${diaNac}-${mesNac}-${anioNac}`;
+
+        // Formatear Fecha de Expiración (Método seguro)
+        // Tomamos "2026-09-30 20:22:28", nos quedamos con "2026-09-30",
+        // lo separamos en ["2026", "09", "30"] y lo reordenamos.
+        const fechaExpString = jugador.fechaExpiracion.split(' ')[0];
+        const [anioExp, mesExp, diaExp] = fechaExpString.split('-');
+        const fechaExpiracionBonita = `${diaExp}-${mesExp}-${anioExp}`;
+        
+        document.getElementById('expiracion-jugador').innerText = fechaExpiracionBonita;
+
+        // --- FIN DE SECCIÓN CORREGIDA ---
 
         const fechaActual = new Date();
         const fechaExpiracion = new Date(jugador.fechaExpiracion);
 
         if (fechaActual > fechaExpiracion) {
-            mostrarError(`El carnet de ${jugador.nombre} ha expirado el ${fechaExpiracion.toLocaleDateString()}.`);
+            mostrarError(`El carnet de ${jugador.nombre} ha expirado el ${fechaExpiracionBonita}.`);
             return;
         }
 
         document.getElementById('nombre-jugador').innerText = jugador.nombre;
         document.getElementById('cedula-jugador').innerText = jugador.cedula;
-        document.getElementById('fecha-jugador').innerText = jugador.fechaNacimiento;
         document.getElementById('camiseta-jugador').innerText = jugador.camiseta;
         
-        // --- SECCIÓN CORREGIDA PARA LAS IMÁGENES DE TURSO ---
-        // Ahora leemos la URL directamente de la propiedad correspondiente.
         if (jugador.logoEquipoURL) {
             document.getElementById('logo-equipo').src = jugador.logoEquipoURL;
         }
